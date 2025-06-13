@@ -18,6 +18,8 @@
         .keyword { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 6px 14px; border-radius: 16px; margin: 4px 6px; font-size: 1rem; }
         .error { color: #d32f2f; text-align: center; margin-top: 16px; }
         .method-select { margin-top: 8px; }
+        .stats { margin-top: 32px; }
+        .top-keywords { margin-top: 32px; }
     </style>
 </head>
 <body>
@@ -38,16 +40,22 @@
             </div>
         </form>
         <div class="error" id="error"></div>
+        <div class="stats" id="stats"></div>
         <div class="keywords" id="keywords"></div>
+        <div class="top-keywords" id="top-keywords"></div>
     </div>
     <script>
         const form = document.getElementById('extract-form');
         const keywordsDiv = document.getElementById('keywords');
         const errorDiv = document.getElementById('error');
+        const statsDiv = document.getElementById('stats');
+        const topKeywordsDiv = document.getElementById('top-keywords');
         form.onsubmit = async (e) => {
             e.preventDefault();
             keywordsDiv.innerHTML = '';
             errorDiv.textContent = '';
+            statsDiv.innerHTML = '';
+            topKeywordsDiv.innerHTML = '';
             const text = document.getElementById('text').value;
             const url = document.getElementById('url').value;
             const method = document.getElementById('method').value;
@@ -66,8 +74,31 @@
                 if (!resp.ok) {
                     errorDiv.textContent = data.error || 'Extraction failed.';
                 } else {
+                    // Section 1: Text stats
+                    if (data.stats) {
+                        statsDiv.innerHTML = `
+                        <h3>Text Statistics</h3>
+                        <ul style="list-style:none;padding:0;">
+                            <li><b>Words:</b> ${data.stats.words}</li>
+                            <li><b>Characters:</b> ${data.stats.characters}</li>
+                            <li><b>Characters (no space):</b> ${data.stats.characters_no_space}</li>
+                            <li><b>Syllables:</b> ${data.stats.syllables}</li>
+                            <li><b>Sentences:</b> ${data.stats.sentences}</li>
+                            <li><b>Paragraphs:</b> ${data.stats.paragraphs}</li>
+                        </ul>`;
+                    }
+                    // Section 2: Top n-gram keywords
+                    if (data.top_keywords) {
+                        topKeywordsDiv.innerHTML = `
+                        <h3>Top Keywords</h3>
+                        <div><b>1-word:</b> ${data.top_keywords['1_word'].map(k=>`<span class="keyword">${k}</span>`).join(' ')}</div>
+                        <div><b>2-word:</b> ${data.top_keywords['2_word'].map(k=>`<span class="keyword">${k}</span>`).join(' ')}</div>
+                        <div><b>3-word:</b> ${data.top_keywords['3_word'].map(k=>`<span class="keyword">${k}</span>`).join(' ')}</div>
+                        `;
+                    }
+                    // Section 3: Extracted keywords
                     if (data.keywords && data.keywords.length) {
-                        keywordsDiv.innerHTML = data.keywords.map(k => `<span class="keyword">${k}</span>`).join(' ');
+                        keywordsDiv.innerHTML = `<h3>Extracted Keywords</h3>` + data.keywords.map(k => `<span class="keyword">${k}</span>`).join(' ');
                     } else {
                         keywordsDiv.innerHTML = '<span>No keywords found.</span>';
                     }
