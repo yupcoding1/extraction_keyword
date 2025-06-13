@@ -6,8 +6,11 @@ import yake
 import re
 import nltk
 from collections import Counter
+from nltk.corpus import stopwords
+import string
 
 nltk.download('punkt')
+nltk.download('stopwords')
 
 app = Flask(__name__)
 
@@ -59,11 +62,13 @@ def extract_keywords(text, method='rake', max_keywords=15):
         return []
 
 def ngram_keywords(text, n=1, top_n=10):
-    words = [w.lower() for w in nltk.word_tokenize(text) if w.isalpha()]
+    stop_words = set(stopwords.words('english'))
+    words = [w.lower() for w in nltk.word_tokenize(text)
+             if w.isalpha() and w.lower() not in stop_words]
     ngrams = zip(*[words[i:] for i in range(n)])
     ngram_list = [' '.join(ng) for ng in ngrams]
     counter = Counter(ngram_list)
-    return [kw for kw, _ in counter.most_common(top_n)]
+    return [kw for kw, _ in counter.most_common(top_n) if not any(w in stop_words for w in kw.split())]
 
 @app.route('/')
 def index():
