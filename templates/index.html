@@ -20,6 +20,7 @@
         .method-select { margin-top: 8px; }
         .stats { margin-top: 32px; }
         .top-keywords { margin-top: 32px; }
+        .detected-lang { margin-top: 10px; text-align: center; color: #1976d2; }
     </style>
 </head>
 <body>
@@ -39,6 +40,7 @@
             </select>
             <label for="lang">Language</label>
             <select id="lang" class="method-select">
+                <option value="auto">Auto Detect</option>
                 <option value="en">English</option>
                 <option value="hi">Hindi</option>
                 <option value="mr">Marathi</option>
@@ -49,6 +51,7 @@
             </div>
         </form>
         <div class="error" id="error"></div>
+        <div class="detected-lang" id="detected-lang"></div>
         <div class="stats" id="stats"></div>
         <div class="keywords" id="keywords"></div>
         <div class="top-keywords" id="top-keywords"></div>
@@ -59,12 +62,14 @@
         const errorDiv = document.getElementById('error');
         const statsDiv = document.getElementById('stats');
         const topKeywordsDiv = document.getElementById('top-keywords');
+        const detectedLangDiv = document.getElementById('detected-lang');
         form.onsubmit = async (e) => {
             e.preventDefault();
             keywordsDiv.innerHTML = '';
             errorDiv.textContent = '';
             statsDiv.innerHTML = '';
             topKeywordsDiv.innerHTML = '';
+            detectedLangDiv.textContent = '';
             const text = document.getElementById('text').value;
             const url = document.getElementById('url').value;
             const method = document.getElementById('method').value;
@@ -84,6 +89,11 @@
                 if (!resp.ok) {
                     errorDiv.textContent = data.error || 'Extraction failed.';
                 } else {
+                    // Show detected language if present
+                    if (data.detected_lang) {
+                        let langMap = {en: 'English', hi: 'Hindi', mr: 'Marathi', ar: 'Arabic'};
+                        detectedLangDiv.textContent = `Detected Language: ${langMap[data.detected_lang] || data.detected_lang}`;
+                    }
                     // Section 1: Text stats
                     if (data.stats) {
                         statsDiv.innerHTML = `

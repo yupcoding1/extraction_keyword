@@ -4,7 +4,7 @@ This project is a web application for extracting keywords and analyzing text sta
 
 ## Features
 - **Paste Text or Enter URL:** Extract keywords and analyze statistics from user-pasted text or from the main content of a web page (URL).
-- **Extraction Methods:** Choose between RAKE and YAKE keyword extraction algorithms.
+- **Extraction Methods:** Choose between RAKE, YAKE, KeyBERT, and TextRank keyword extraction algorithms.
 - **Text Statistics:** Instantly get:
   - Number of words
   - Number of characters
@@ -14,13 +14,18 @@ This project is a web application for extracting keywords and analyzing text sta
   - Number of paragraphs
 - **Top Keywords:**
   - 1-word, 2-word, and 3-word keywords (n-grams), filtered to exclude common stopwords (prepositions, pronouns, etc.)
+- **Multilanguage Support:**
+  - Stopword filtering and n-gram keyword extraction for English, Hindi, Marathi, and Arabic.
+  - **Auto Language Detection:** The app can automatically detect the language of the input text and use the appropriate stopword list for filtering.
 - **Modern UI:** Clean, responsive, and user-friendly interface.
 
 ## How It Works
 1. **Paste text** or **enter a URL** in the web form.
-2. Select the extraction method (RAKE or YAKE).
-3. Click **Extract Keywords**.
-4. The app will display:
+2. Select the extraction method (RAKE, YAKE, KeyBERT, or TextRank).
+3. Select the language (or choose "Auto Detect").
+4. Click **Extract Keywords**.
+5. The app will display:
+   - Detected language (if auto-detect is used)
    - Text statistics (words, characters, syllables, etc.)
    - Top 1-word, 2-word, and 3-word keywords (excluding stopwords)
    - Extracted keywords using the selected method
@@ -58,13 +63,15 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The app will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
+The app will be available at [http://localhost:5000](http://localhost:5000).
 
 ## Usage
 - Paste any text or provide a news/article URL.
-- Select the extraction method (RAKE or YAKE).
+- Select the extraction method (RAKE, YAKE, KeyBERT, or TextRank).
+- Select the language (or "Auto Detect").
 - Click **Extract Keywords**.
 - View:
+  - Detected language (if auto-detect is used)
   - Text statistics (top section)
   - Top 1-word, 2-word, and 3-word keywords (middle section)
   - Extracted keywords (bottom section)
@@ -86,11 +93,17 @@ keyword_extractor/
 - rake-nltk
 - yake
 - nltk
+- keybert
+- sentence-transformers
+- textrank4zh
+- langdetect
 
 ## Notes
 - The app uses NLTK for tokenization, stopword filtering, and text statistics. The first run will download required NLTK data.
 - For URLs, the app attempts to extract the main content by collecting all `<p>` tags.
-- Top n-gram keywords are filtered to exclude common English stopwords.
+- Top n-gram keywords are filtered to exclude common stopwords in the selected or detected language.
+- Auto language detection is powered by `langdetect` and supports English, Hindi, Marathi, and Arabic for stopword filtering.
+- For TextRank, ensure `networkx==2.8` is installed for compatibility with `textrank4zh`.
 
 ## License
 This project is for demonstration and educational purposes only.

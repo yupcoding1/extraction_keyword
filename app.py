@@ -9,6 +9,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 import string
 from keybert import KeyBERT
+from langdetect import detect
 try:
     from textrank4zh import TextRank4Keyword
 except ImportError:
@@ -105,11 +106,18 @@ def extract():
     text = data.get('text', '').strip()
     url = data.get('url', '').strip()
     method = data.get('method', 'rake')
-    lang = data.get('lang', 'en')
+    lang = data.get('lang')
     if url:
         text = extract_text_from_url(url)
     if not text:
         return jsonify({'error': 'No text found.'}), 400
+    # Auto-detect language if not provided
+    if not lang or lang == 'auto':
+        try:
+            detected = detect(text)
+            lang = detected if detected in SUPPORTED_LANGS else 'en'
+        except:
+            lang = 'en'
     stats = get_text_stats(text)
     keywords = extract_keywords(text, method=method)
     top1 = ngram_keywords(text, n=1, top_n=10, lang=lang)
@@ -122,7 +130,8 @@ def extract():
             '1_word': top1,
             '2_word': top2,
             '3_word': top3
-        }
+        },
+        'detected_lang': lang
     })
 
 if __name__ == '__main__':

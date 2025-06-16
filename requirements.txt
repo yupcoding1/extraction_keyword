@@ -8,3 +8,4 @@ keybert
 sentence-transformers
 textrank4zh
 networkx==2.8
+langdetect
