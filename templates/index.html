@@ -37,6 +37,13 @@
                 <option value="keybert">KeyBERT</option>
                 <option value="textrank">TextRank</option>
             </select>
+            <label for="lang">Language</label>
+            <select id="lang" class="method-select">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="mr">Marathi</option>
+                <option value="ar">Arabic</option>
+            </select>
             <div class="actions">
                 <button type="submit" id="extract-btn">Extract Keywords</button>
             </div>
@@ -61,6 +68,7 @@
             const text = document.getElementById('text').value;
             const url = document.getElementById('url').value;
             const method = document.getElementById('method').value;
+            const lang = document.getElementById('lang').value;
             if (!text && !url) {
                 errorDiv.textContent = 'Please paste text or enter a URL.';
                 return;
@@ -70,7 +78,7 @@
                 const resp = await fetch('/extract', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, url, method })
+                    body: JSON.stringify({ text, url, method, lang })
                 });
                 const data = await resp.json();
                 if (!resp.ok) {

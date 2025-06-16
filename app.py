@@ -19,6 +19,14 @@ nltk.download('stopwords')
 
 app = Flask(__name__)
 
+# Supported languages for stopwords
+SUPPORTED_LANGS = {
+    'en': 'english',
+    'hi': 'hindi',
+    'mr': 'marathi',
+    'ar': 'arabic'
+}
+
 # Helper to extract text from URL
 def extract_text_from_url(url):
     try:
@@ -74,8 +82,12 @@ def extract_keywords(text, method='rake', max_keywords=15):
     else:
         return []
 
-def ngram_keywords(text, n=1, top_n=10):
-    stop_words = set(stopwords.words('english'))
+def ngram_keywords(text, n=1, top_n=10, lang='en'):
+    lang_code = SUPPORTED_LANGS.get(lang, 'english')
+    try:
+        stop_words = set(stopwords.words(lang_code))
+    except:
+        stop_words = set(stopwords.words('english'))
     words = [w.lower() for w in nltk.word_tokenize(text)
              if w.isalpha() and w.lower() not in stop_words]
     ngrams = zip(*[words[i:] for i in range(n)])
@@ -93,15 +105,16 @@ def extract():
     text = data.get('text', '').strip()
     url = data.get('url', '').strip()
     method = data.get('method', 'rake')
+    lang = data.get('lang', 'en')
     if url:
         text = extract_text_from_url(url)
     if not text:
         return jsonify({'error': 'No text found.'}), 400
     stats = get_text_stats(text)
     keywords = extract_keywords(text, method=method)
-    top1 = ngram_keywords(text, n=1, top_n=10)
-    top2 = ngram_keywords(text, n=2, top_n=10)
-    top3 = ngram_keywords(text, n=3, top_n=10)
+    top1 = ngram_keywords(text, n=1, top_n=10, lang=lang)
+    top2 = ngram_keywords(text, n=2, top_n=10, lang=lang)
+    top3 = ngram_keywords(text, n=3, top_n=10, lang=lang)
     return jsonify({
         'keywords': keywords,
         'stats': stats,
