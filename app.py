@@ -8,6 +8,11 @@ import nltk
 from collections import Counter
 from nltk.corpus import stopwords
 import string
+from keybert import KeyBERT
+try:
+    from textrank4zh import TextRank4Keyword
+except ImportError:
+    TextRank4Keyword = None
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -58,6 +63,14 @@ def extract_keywords(text, method='rake', max_keywords=15):
         kw_extractor = yake.KeywordExtractor(lan="en", n=1, top=max_keywords)
         keywords = kw_extractor.extract_keywords(text)
         return [kw for kw, score in keywords]
+    elif method == 'keybert':
+        kw_model = KeyBERT()
+        keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english', top_n=max_keywords)
+        return [kw for kw, score in keywords]
+    elif method == 'textrank' and TextRank4Keyword is not None:
+        tr4w = TextRank4Keyword()
+        tr4w.analyze(text=text, lower=True, window=2)
+        return [kw.word for kw in tr4w.get_keywords(num=max_keywords, word_min_len=1)]
     else:
         return []
 

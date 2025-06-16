@@ -58,7 +58,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The app will be available at [http://localhost:5000](http://localhost:5000).
+The app will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 ## Usage
 - Paste any text or provide a news/article URL.

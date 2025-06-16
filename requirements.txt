@@ -3,3 +3,8 @@ requests
 beautifulsoup4
 rake-nltk
 yake
+nltk
+keybert
+sentence-transformers
+textrank4zh
+networkx==2.8
